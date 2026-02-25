@@ -4,6 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QRHistoryProvider } from '@/providers/QRHistoryProvider';
+import { RevenueCatProvider } from '@/providers/RevenueCatProvider';
 import Colors from '@/constants/colors';
 
 SplashScreen.preventAutoHideAsync();
@@ -19,6 +20,14 @@ function RootLayoutNav() {
       }}
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="paywall"
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+          gestureEnabled: true,
+        }}
+      />
     </Stack>
   );
 }
@@ -31,9 +40,11 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView>
-        <QRHistoryProvider>
-          <RootLayoutNav />
-        </QRHistoryProvider>
+        <RevenueCatProvider>
+          <QRHistoryProvider>
+            <RootLayoutNav />
+          </QRHistoryProvider>
+        </RevenueCatProvider>
       </GestureHandlerRootView>
     </QueryClientProvider>
   );

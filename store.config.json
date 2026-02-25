@@ -1,0 +1,44 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "copyright": "2025 Zain Razak",
+    "categories": ["UTILITIES", "PRODUCTIVITY"],
+    "info": {
+      "en-US": {
+        "title": "QR Code Genie",
+        "subtitle": "Generate & Scan QR Codes",
+        "description": "Create, scan, and share QR codes instantly with QR Code Genie — the fast, beautiful, and privacy-friendly QR code tool.\n\nKEY FEATURES:\n• Instant QR Generation — Paste any URL, text, email, phone number, or Wi-Fi config and get a scannable QR code in seconds\n• Built-in QR Scanner — Use your camera to scan and decode any QR code with real-time detection\n• Save to Photos — Download your QR codes directly to your camera roll in high resolution\n• Share Anywhere — Send QR codes via AirDrop, Messages, email, or any app on your phone\n• Smart History — All your created and scanned QR codes are saved and organized for easy access\n• Content Detection — Automatically recognizes URLs, emails, phone numbers, Wi-Fi configs, and plain text\n\nWHY QR CODE GENIE?\nNo ads. No tracking. No account required. Just open the app, create or scan, and go. Your data stays on your device.\n\nPERFECT FOR:\n• Small business owners — Create QR codes for menus, flyers, and business cards\n• Event organizers — Share links, tickets, and info via QR codes\n• Students & teachers — Share documents, links, and resources\n• Anyone who needs a fast, reliable QR code tool\n\nDownload QR Code Genie and start creating QR codes in seconds.",
+        "keywords": ["qr code,qr generator,qr scanner,qr maker,barcode,scan,create qr,qr reader,code generator,share"],
+        "releaseNotes": "Initial release of QR Code Genie! Create, scan, save, and share QR codes with a beautiful dark-themed interface.",
+        "privacyPolicyUrl": "https://www.freeprivacypolicy.com/live/8eb90d83-20ea-4c16-899d-f3d30c19e08c",
+        "supportUrl": "https://www.freeprivacypolicy.com/live/8eb90d83-20ea-4c16-899d-f3d30c19e08c"
+      }
+    },
+    "advisory": {
+      "alcoholTobaccoOrDrugUseOrReferences": "NONE",
+      "gamblingSimulated": "NONE",
+      "medicalOrTreatmentInformation": "NONE",
+      "profanityOrCrudeHumor": "NONE",
+      "sexualContentGraphicAndNudity": "NONE",
+      "sexualContentOrNudity": "NONE",
+      "horrorOrFearThemes": "NONE",
+      "matureOrSuggestiveThemes": "NONE",
+      "violenceCartoonOrFantasy": "NONE",
+      "violenceRealistic": "NONE",
+      "violenceRealisticProlongedGraphicOrSadistic": "NONE",
+      "contests": "NONE",
+      "gambling": false,
+      "unrestrictedWebAccess": false,
+      "seventeenPlus": false
+    },
+    "release": {
+      "automaticRelease": true
+    },
+    "review": {
+      "firstName": "Zain",
+      "lastName": "Razak",
+      "email": "zainrazak007@gmail.com",
+      "phone": "+1 7144147456"
+    }
+  }
+}

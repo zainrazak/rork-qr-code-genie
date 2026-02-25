@@ -14,11 +14,13 @@ import {
   Linking,
 } from 'react-native';
 import { Image } from 'expo-image';
-import { Download, Share2, X, QrCode, Check, Link2, FileText, Globe, ChevronDown, ChevronUp, Info } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { Download, Share2, X, QrCode, Check, Link2, FileText, Globe, ChevronDown, ChevronUp, Info, Crown } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/colors';
 import { getQRCodeUrl, normalizeUrl, looksLikeUrl } from '@/utils/qr';
 import { useQRHistory } from '@/providers/QRHistoryProvider';
+import { useRevenueCat } from '@/providers/RevenueCatProvider';
 
 const GUIDE_ITEMS = [
   {
@@ -51,6 +53,8 @@ export default function GenerateScreen() {
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
   const [showGuide, setShowGuide] = useState<boolean>(false);
   const { addToHistory } = useQRHistory();
+  const { isPro, canCreateQR, freeUsesRemaining, recordUsage } = useRevenueCat();
+  const router = useRouter();
   const guideHeight = useRef(new Animated.Value(0)).current;
 
   const qrOpacity = useRef(new Animated.Value(0)).current;
@@ -94,6 +98,13 @@ export default function GenerateScreen() {
 
   const handleSave = useCallback(async () => {
     if (!hasContent) return;
+
+    if (!canCreateQR) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      router.push('/paywall');
+      return;
+    }
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setIsSaving(true);
 
@@ -101,6 +112,7 @@ export default function GenerateScreen() {
 
     try {
       addToHistory(content);
+      recordUsage();
 
       if (Platform.OS === 'web') {
         Linking.openURL(getQRCodeUrl(content, 800));
@@ -133,6 +145,13 @@ export default function GenerateScreen() {
 
   const handleShare = useCallback(async () => {
     if (!hasContent) return;
+
+    if (!canCreateQR) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      router.push('/paywall');
+      return;
+    }
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setIsSharing(true);
 
@@ -265,6 +284,26 @@ export default function GenerateScreen() {
               </Text>
             </View>
           </Animated.View>
+        )}
+
+        {!isPro && (
+          <TouchableOpacity
+            style={styles.usageBanner}
+            onPress={() => router.push('/paywall')}
+            activeOpacity={0.7}
+          >
+            <View style={styles.usageBannerLeft}>
+              <Crown size={16} color={canCreateQR ? '#F59E0B' : Colors.danger} />
+              <Text style={styles.usageBannerText}>
+                {canCreateQR
+                  ? `${freeUsesRemaining} free QR code${freeUsesRemaining !== 1 ? 's' : ''} remaining`
+                  : 'Free limit reached'}
+              </Text>
+            </View>
+            <Text style={styles.usageBannerCta}>
+              {canCreateQR ? 'Upgrade' : 'Go Pro'}
+            </Text>
+          </TouchableOpacity>
         )}
 
         <View style={styles.qrSection}>
@@ -619,5 +658,32 @@ const styles = StyleSheet.create({
     color: '#F59E0B',
     lineHeight: 19,
     fontWeight: '500' as const,
+  },
+  usageBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(245, 158, 11, 0.08)',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.2)',
+  },
+  usageBannerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  usageBannerText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: '#F59E0B',
+  },
+  usageBannerCta: {
+    fontSize: 13,
+    fontWeight: '700' as const,
+    color: Colors.accent,
   },
 });

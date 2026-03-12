@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  Linking,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -26,10 +27,15 @@ const FEATURES = [
 export default function PaywallScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { currentOffering, purchasePackage, restorePurchases } = useRevenueCat();
+  const { currentOffering, purchasePackage, restorePurchases, isLoading, initializeRC, rcError } = useRevenueCat();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+
+  // Deferred init: only initialize RevenueCat when paywall opens
+  useEffect(() => {
+    initializeRC();
+  }, [initializeRC]);
 
   const packages = currentOffering?.availablePackages ?? [];
 
@@ -122,7 +128,7 @@ export default function PaywallScreen() {
 
         {packages.length > 0 ? (
           <View style={styles.packagesSection}>
-            {packages.map((pkg, idx) => {
+            {packages.map((pkg: any, idx: number) => {
               const isSelected = idx === selectedIndex;
               return (
                 <TouchableOpacity
@@ -154,8 +160,27 @@ export default function PaywallScreen() {
           </View>
         ) : (
           <View style={styles.loadingPackages}>
-            <ActivityIndicator color={Colors.accent} />
-            <Text style={styles.loadingText}>Loading plans...</Text>
+            {isLoading ? (
+              <>
+                <ActivityIndicator color={Colors.accent} />
+                <Text style={styles.loadingText}>Loading plans...</Text>
+              </>
+            ) : rcError ? (
+              <>
+                <Text style={[styles.loadingText, { paddingHorizontal: 16 }]} selectable>{rcError}</Text>
+                <TouchableOpacity
+                  style={{ marginTop: 12, paddingVertical: 8, paddingHorizontal: 16, backgroundColor: Colors.surface, borderRadius: 8 }}
+                  onPress={() => initializeRC()}
+                >
+                  <Text style={{ color: Colors.accent, fontSize: 14, fontWeight: '600' }}>Retry</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <ActivityIndicator color={Colors.accent} />
+                <Text style={styles.loadingText}>Loading plans...</Text>
+              </>
+            )}
           </View>
         )}
 
@@ -188,6 +213,22 @@ export default function PaywallScreen() {
         <Text style={styles.legalText}>
           Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews unless it is cancelled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage and cancel your subscriptions by going to your account settings on the App Store after purchase.
         </Text>
+
+        <View style={styles.legalLinks}>
+          <TouchableOpacity
+            onPress={() => Linking.openURL('https://zainrazak.github.io/rork-qr-code-genie/terms.html')}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={styles.legalLink}>Terms of Use (EULA)</Text>
+          </TouchableOpacity>
+          <Text style={styles.legalSeparator}>|</Text>
+          <TouchableOpacity
+            onPress={() => Linking.openURL('https://zainrazak.github.io/rork-qr-code-genie/privacy.html')}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={styles.legalLink}>Privacy Policy</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -381,5 +422,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 16,
     opacity: 0.7,
+  },
+  legalLinks: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 12,
+    gap: 8,
+  },
+  legalLink: {
+    fontSize: 12,
+    color: Colors.accent,
+    fontWeight: '500',
+    textDecorationLine: 'underline',
+  },
+  legalSeparator: {
+    fontSize: 12,
+    color: Colors.textTertiary,
+    opacity: 0.5,
   },
 });

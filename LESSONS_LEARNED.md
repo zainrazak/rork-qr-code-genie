@@ -78,8 +78,8 @@ A complete, step-by-step guide for launching iOS apps built with Expo/React Nati
   1. Home/main screen (first impression)
   2. Core feature in action
   3. Secondary feature
-  4. Subscription/paywall
-  5. Additional screens
+  4. Additional screens
+- ⚠️ **DO NOT include screenshots showing pricing, payment UI, or subscription purchase dialogs** — Apple will reject them. Paywall/subscription screens should NOT be in your App Store screenshots.
 
 #### Text Fields
 - [ ] **Promotional Text** (170 chars, changeable without review)
@@ -114,14 +114,36 @@ A complete, step-by-step guide for launching iOS apps built with Expo/React Nati
   - "Automatically release this version" (goes live immediately after approval)
   - "Manually release this version" (you control when it goes live)
 
-### Phase 5: Privacy & Legal
-> Required before submission
+### Phase 5: Privacy, Legal & EULA
+> Required before submission — Apple WILL reject without these (Guideline 3.1.2(c))
 
-- [ ] **Privacy Policy URL** — App Privacy section
-  > Must be a real webpage. Can be the same page as your Support URL
+#### Privacy Policy
+- [ ] Create a **dedicated Privacy Policy page** hosted on the web (e.g., GitHub Pages)
+- [ ] Set **Privacy Policy URL** in App Store Connect → App Privacy section
 - [ ] **App Privacy Details** — App Privacy → Get Started
   > Answer data collection questionnaire. If your app stores everything locally:
   > Select **"No, we do not collect data from this app"**
+
+#### Terms of Use / EULA (required for subscription apps)
+- [ ] Create a **dedicated Terms of Use page** hosted on the web
+- [ ] Add a **custom EULA** in App Store Connect:
+  1. Go to App Information → scroll to License Agreement → click Edit
+  2. Select "Apply a custom EULA to all chosen countries or regions"
+  3. Paste your EULA as **plain text** (no HTML — tags are stripped)
+  4. Select all 175 countries → click Done → Save
+  - ⚠️ The EULA must meet [Apple's minimum terms](https://apple.com/legal/internet-services/itunes/dev/minterms/) — include all 10 required sections
+  - ⚠️ Must include: developer name, contact info, subscription pricing/terms, warranty, third-party beneficiary clause (Apple)
+
+#### In-App Links (required for subscription apps)
+- [ ] Add **functional tappable links** to Terms of Use AND Privacy Policy **inside the app's purchase flow** (paywall screen)
+  - Must open in browser via `Linking.openURL()`
+  - Plain text legal disclaimers are NOT sufficient — Apple requires clickable links
+  - Example:
+    ```typescript
+    <TouchableOpacity onPress={() => Linking.openURL('https://yoursite.com/terms')}>
+      <Text style={styles.legalLink}>Terms of Use (EULA)</Text>
+    </TouchableOpacity>
+    ```
 
 ### Phase 6: Submit
 - [ ] Click **"Add for Review"**
@@ -275,6 +297,30 @@ sips -z 2778 1284 input.png --out output.png
 **Symptom:** "Upgrade or make this repository public to enable Pages"
 **Fix:** Make repo public, or use `gh api` to enable Pages programmatically.
 
+### 7. App Review Rejection — Guideline 3.1.2(c) (Missing EULA & Privacy Links)
+**Symptom:** App rejected with: "The submission did not include all the required information for apps offering auto-renewable subscriptions." Specifically missing functional links to Terms of Use (EULA) and Privacy Policy within the app.
+
+**What Apple requires for subscription apps:**
+1. **In the app itself** (within the purchase flow / paywall):
+   - Title of auto-renewing subscription
+   - Length and price of subscription
+   - **Functional tappable links** to Terms of Use (EULA) and Privacy Policy (plain text is NOT enough)
+2. **In App Store Connect metadata:**
+   - Privacy Policy URL set in the Privacy Policy field
+   - Custom EULA added via App Information → License Agreement → Edit → paste plain text EULA meeting [Apple's minimum terms](https://apple.com/legal/internet-services/itunes/dev/minterms/)
+
+**Fix (3 parts):**
+1. Create dedicated Terms of Use and Privacy Policy web pages (e.g., `docs/terms.html`, `docs/privacy.html` on GitHub Pages)
+2. Add `TouchableOpacity` + `Linking.openURL()` links in the paywall screen pointing to those pages
+3. Add custom EULA in App Store Connect (App Information → License Agreement) as plain text covering all 10 of Apple's minimum required sections
+
+**Key Lesson:** Apple's standard EULA is NOT shown on your product page. For subscription apps, you MUST provide a custom EULA with subscription details, or Apple will reject.
+
+### 8. Screenshots Containing Pricing Get Rejected
+**Symptom:** App Store screenshots showing subscription prices, payment dialogs, or purchase confirmation UI are rejected.
+
+**Fix:** Never include paywall, pricing, or payment screenshots in your App Store listing screenshots. Only show app functionality screens (home, features, scan, history, etc.).
+
 ---
 
 ## Debugging Native Crashes
@@ -313,10 +359,13 @@ When facing crashes that can't be caught by JS try/catch:
 □ RevenueCat configured with matching product IDs + appl_ API key
 □ App builds and runs on TestFlight without crashes
 □ Payments work in TestFlight sandbox
-□ Screenshots resized to 1284 × 2778px
+□ Screenshots resized to 1284 × 2778px (NO pricing/payment screenshots!)
 □ Support page live (GitHub Pages)
+□ Terms of Use page live + Custom EULA pasted in App Store Connect
+□ Privacy Policy page live + URL set in App Store Connect
+□ Paywall has TAPPABLE LINKS to Terms of Use and Privacy Policy
+□ App Privacy questionnaire completed
 □ App Store listing complete: description, keywords, screenshots, category
-□ Privacy Policy URL set + App Privacy questionnaire completed
 □ Content Rights set in App Information
 □ Build attached to version + subscriptions attached to version
 □ Submit for review
